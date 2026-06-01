@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "YT Silent AdBlock v2",
+  "version": "2.0",
+  "description": "Silently blocks all YouTube ads without detection",
+  "permissions": [
+    "declarativeNetRequest"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "*://*.googlevideo.com/*",
+    "*://googleads.g.doubleclick.net/*",
+    "*://*.googlesyndication.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "icons": {
+    "16":  "icon.png",
+    "48":  "icon.png",
+    "128": "icon.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["page-patch.js"],
+      "matches": ["*://*.youtube.com/*"]
+    }
+  ]
+}
