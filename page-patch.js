@@ -55,6 +55,11 @@
     "adFeedbackRenderer",
   ]);
 
+  // Merge dynamically fetched keys if they were injected by the content script
+  if (window.__YT_DYNAMIC_STRIP_KEYS__ && Array.isArray(window.__YT_DYNAMIC_STRIP_KEYS__)) {
+    window.__YT_DYNAMIC_STRIP_KEYS__.forEach(key => STRIP_KEYS.add(key));
+  }
+
   /**
    * Array-type keys to EMPTY (set to []) rather than delete.
    * These must exist as empty arrays or YouTube throws runtime errors

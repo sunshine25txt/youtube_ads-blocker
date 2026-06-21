@@ -137,12 +137,31 @@
     // Prevent duplicate injection
     if (document.querySelector(`script[src="${scriptUrl}"]`)) return;
 
-    const script = document.createElement("script");
-    script.src = scriptUrl;
-    // Remove the script tag after execution to keep DOM clean
-    script.onload = () => script.remove();
-    script.onerror = () => script.remove();
-    (document.documentElement || document.head).appendChild(script);
+    // Inject dynamic config first if available
+    try {
+      chrome.storage.local.get("dynamicStripKeys", (res) => {
+        if (res.dynamicStripKeys && Array.isArray(res.dynamicStripKeys)) {
+          const configScript = document.createElement("script");
+          configScript.textContent = `window.__YT_DYNAMIC_STRIP_KEYS__ = ${JSON.stringify(res.dynamicStripKeys)};`;
+          (document.documentElement || document.head).appendChild(configScript);
+          configScript.remove();
+        }
+        
+        // Then inject the main patch script
+        const script = document.createElement("script");
+        script.src = scriptUrl;
+        script.onload = () => script.remove();
+        script.onerror = () => script.remove();
+        (document.documentElement || document.head).appendChild(script);
+      });
+    } catch (_) {
+      // Fallback if storage fails
+      const script = document.createElement("script");
+      script.src = scriptUrl;
+      script.onload = () => script.remove();
+      script.onerror = () => script.remove();
+      (document.documentElement || document.head).appendChild(script);
+    }
   }
 
   /* ─── Ad Skip Logic ─── */

@@ -5,7 +5,9 @@
   "description": "Silently blocks all YouTube ads without detection",
   "permissions": [
     "declarativeNetRequest",
-    "declarativeNetRequestFeedback"
+    "declarativeNetRequestFeedback",
+    "alarms",
+    "storage"
   ],
   "host_permissions": [
     "*://*.youtube.com/*",

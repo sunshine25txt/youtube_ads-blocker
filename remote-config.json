@@ -1,0 +1,18 @@
+{
+  "rules": [
+    {
+      "id": 1001,
+      "priority": 3,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*.googlevideo.com/videoplayback*&oad=*",
+        "resourceTypes": ["xmlhttprequest", "media"]
+      }
+    }
+  ],
+  "stripKeys": [
+    "adPlacements",
+    "playerAds",
+    "adBreakHeartbeatParams"
+  ]
+}
