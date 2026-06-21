@@ -84,10 +84,15 @@ function sanitizeText(text) {
     return text;
   }
 
+  // Handle YouTube's JSON prefix
+  const prefixMatch = text.match(/^(\)]\}'\n)/);
+  const prefix = prefixMatch ? prefixMatch[1] : "";
+  const jsonText = prefix ? text.substring(prefix.length) : text;
+
   try {
-    const parsed = JSON.parse(text);
+    const parsed = JSON.parse(jsonText);
     sanitizeObject(parsed);
-    return JSON.stringify(parsed);
+    return prefix + JSON.stringify(parsed);
   } catch (_) {
     return text;
   }
@@ -137,8 +142,6 @@ function patchResponse(response, bodyText) {
 
 const originalFetch = window.fetch;
 window.fetch = async function (...args) {
-  const response = await originalFetch.apply(this, args);
-
   try {
     const request = args[0];
     const url =
@@ -149,8 +152,10 @@ window.fetch = async function (...args) {
           : "";
 
     if (!shouldPatchUrl(url)) {
-      return response;
+      return originalFetch.apply(this, args);
     }
+
+    const response = await originalFetch.apply(this, args);
 
     const rawText = await response.clone().text();
     const sanitizedText = sanitizeText(rawText);
@@ -161,7 +166,7 @@ window.fetch = async function (...args) {
 
     return patchResponse(response, sanitizedText);
   } catch (_) {
-    return response;
+    return originalFetch.apply(this, args);
   }
 };
 

@@ -119,21 +119,27 @@
       skipButton.click();
     }
 
-    if (Number.isFinite(video.duration) && video.duration > 0) {
-      video.currentTime = Math.max(0, video.duration - 0.05);
-    }
+    try {
+      if (Number.isFinite(video.duration) && video.duration > 0) {
+        video.currentTime = Math.max(0, video.duration - 0.05);
+      }
+    } catch (_) {}
 
-    if (!video.__ytSilentAdblockMuted__) {
-      video.__ytSilentAdblockMuted__ = video.muted ? "already-muted" : "force";
-    }
-    if (!video.muted) {
-      video.muted = true;
-    }
+    try {
+      if (!video.__ytSilentAdblockMuted__) {
+        video.__ytSilentAdblockMuted__ = video.muted ? "already-muted" : "force";
+      }
+      if (!video.muted) {
+        video.muted = true;
+      }
+    } catch (_) {}
 
-    if (video.__ytSilentAdblockRate__ == null) {
-      video.__ytSilentAdblockRate__ = video.playbackRate;
-    }
-    video.playbackRate = 16;
+    try {
+      if (video.__ytSilentAdblockRate__ == null) {
+        video.__ytSilentAdblockRate__ = video.playbackRate;
+      }
+      video.playbackRate = 16;
+    } catch (_) {}
   }
 
   function restoreVideoState() {
@@ -147,7 +153,9 @@
     }
 
     if (video.__ytSilentAdblockRate__ != null) {
-      video.playbackRate = video.__ytSilentAdblockRate__;
+      try {
+        video.playbackRate = video.__ytSilentAdblockRate__;
+      } catch (_) {}
       video.__ytSilentAdblockRate__ = null;
     }
 
@@ -156,7 +164,9 @@
       video.muted &&
       !document.hidden
     ) {
-      video.muted = false;
+      try {
+        video.muted = false;
+      } catch (_) {}
     }
     video.__ytSilentAdblockMuted__ = null;
   }
@@ -173,12 +183,23 @@
     }
 
     const dialogues = document.querySelectorAll(DIALOG_SELECTORS);
+    let removedDialogue = false;
     for (let i = 0; i < dialogues.length; i++) {
       const element = dialogues[i];
       const text = (element.innerText || "").toLowerCase();
       if (text.includes("ad blocker") || text.includes("disable your ad") || text.includes("adblocker")) {
         try {
           element.remove();
+          removedDialogue = true;
+        } catch (_) {}
+      }
+    }
+
+    if (removedDialogue) {
+      const video = document.getElementsByTagName("video")[0];
+      if (video && video.paused) {
+        try {
+          video.play();
         } catch (_) {}
       }
     }
