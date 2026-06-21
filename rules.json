@@ -116,5 +116,41 @@
       "urlFilter": "||fundingchoicesmessages.google.com^",
       "resourceTypes": ["script", "xmlhttprequest", "sub_frame"]
     }
+  },
+  {
+    "id": 14,
+    "priority": 2,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "*://*.googlevideo.com/videoplayback*&oad=*",
+      "resourceTypes": ["xmlhttprequest", "media"]
+    }
+  },
+  {
+    "id": 15,
+    "priority": 2,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "*://*.googlevideo.com/videoplayback*&ctier=A*",
+      "resourceTypes": ["xmlhttprequest", "media"]
+    }
+  },
+  {
+    "id": 16,
+    "priority": 2,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "*://*.googlevideo.com/videoplayback*&ctier=L*",
+      "resourceTypes": ["xmlhttprequest", "media"]
+    }
+  },
+  {
+    "id": 17,
+    "priority": 2,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "||youtube.com/api/stats/qoe?*adformat=*",
+      "resourceTypes": ["xmlhttprequest"]
+    }
   }
 ]

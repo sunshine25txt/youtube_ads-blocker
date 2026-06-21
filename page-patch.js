@@ -358,4 +358,65 @@
       initialData = sanitizeObject(value);
     },
   });
+
+  /* ─── JSON.parse Hijack (Advanced Scriptlet) ─── */
+  const originalParse = JSON.parse;
+  JSON.parse = function() {
+    const parsed = originalParse.apply(this, arguments);
+    if (parsed && typeof parsed === 'object') {
+      // Check for known ad-related root or nested keys
+      if (parsed.adPlacements || parsed.playerAds || parsed.adBreakHeartbeatParams || parsed.adSlots) {
+        return sanitizeObject(parsed);
+      }
+    }
+    return parsed;
+  };
+
+  /* ─── Advanced Video Element Hijack ─── */
+  // Intercept the native play() method to block ads at the player level instantly (Brave-style)
+  const originalPlay = HTMLVideoElement.prototype.play;
+  HTMLVideoElement.prototype.play = function () {
+    try {
+      const src = this.src || '';
+      const isAdUrl = src.includes('oad=') || src.includes('ctier=A') || src.includes('/ad/');
+      const isAdClass = this.closest && this.closest('.ad-showing');
+      
+      if (isAdUrl || isAdClass) {
+        // Fast forward instantly before any frame renders
+        if (Number.isFinite(this.duration) && this.duration > 0) {
+          this.currentTime = this.duration - 0.1;
+        }
+      }
+    } catch (_) {}
+    return originalPlay.apply(this, arguments);
+  };
+
+  /* ─── Anti-Adblock Detection Spoofing ─── */
+  // Intercept window.ytcfg.set to modify experiment flags before they take effect
+  let realYtcfg = window.ytcfg;
+  Object.defineProperty(window, 'ytcfg', {
+    configurable: true,
+    get() { return realYtcfg; },
+    set(val) {
+      if (val && typeof val.set === 'function') {
+        const originalSet = val.set;
+        val.set = function() {
+          if (arguments[0] && typeof arguments[0] === 'object') {
+            const flags = arguments[0].EXPERIMENT_FLAGS;
+            if (flags) {
+              // Neutralize common anti-adblock detection flags
+              delete flags.ab_dict_fe_req;
+              flags.cb_v2_use_videoplayback_ad_signals = false;
+              flags.web_enable_adblock_payload_suppression = false;
+              flags.adblock_metrics_payload = false;
+              flags.ios_enable_adblock_messaging = false;
+            }
+          }
+          return originalSet.apply(this, arguments);
+        };
+      }
+      realYtcfg = val;
+    }
+  });
+
 })();
