@@ -1,16 +1,17 @@
 {
   "manifest_version": 3,
   "name": "YT Silent AdBlock v2",
-  "version": "2.0",
+  "version": "2.1",
   "description": "Silently blocks all YouTube ads without detection",
   "permissions": [
-    "declarativeNetRequest"
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback"
   ],
   "host_permissions": [
     "*://*.youtube.com/*",
-    "*://*.googlevideo.com/*",
     "*://googleads.g.doubleclick.net/*",
-    "*://*.googlesyndication.com/*"
+    "*://*.googlesyndication.com/*",
+    "*://*.doubleclick.net/*"
   ],
   "content_scripts": [
     {
